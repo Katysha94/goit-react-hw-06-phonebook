@@ -1,44 +1,53 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { ContactForm } from "./ContactForm/ContactForm";
 import { ContactList } from './ContactList/ContactList';
 import { FilterContact } from './FilterContact/FilterContact';
 import { Section } from './Section/Section';
+import { useDispatch, useSelector } from 'react-redux';
 
 
-export const  App = () =>  {
+export const App = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector((state) => state.contactsStore.contacts);
+  const filter = useSelector((state) => state.contactsStore.filter);
 
-  const [contacts, setContacts] = useState(() => 
-    JSON.parse(localStorage.getItem('contacts')) ?? []
-  );
-  const [filter, setFilter] = useState('');
+ 
   
-  useEffect(() => {
-    const contacts = localStorage.getItem('contacts');
-    const parsedContacts = JSON.parse(contacts)
+  // useEffect(() => {
+    // const contacts = localStorage.getItem('contacts');
+    // const parsedContacts = JSON.parse(contacts)
   
-    if (parsedContacts) {
-      setContacts(parsedContacts)
-    } 
-  }, [])
+  //   if (contacts) {
+  //     setContacts(parsedContacts)
+  //   } 
+  // }, [])
 
   useEffect(() => {
     localStorage.setItem('contacts', JSON.stringify(contacts))
   }, [contacts]);
  
 
-  const handleNewContact = (newContact) => {
-   const existingContact = contacts.find(contact => contact.name === newContact.name);
+  function handleNewContact(newContact) {
+    const existingContact = contacts.find(contact => contact.name === newContact.name);
     if (existingContact) {
       alert(`Contact ${newContact.name} already exists!`);
     } else {
-      setContacts(prevState => [...prevState, newContact]);
-    } 
-   
+      const addContactAction = {
+        type: 'contacts/addContacts',
+        payload: newContact,
+      };
+      dispatch(addContactAction);
+    }
+
   }
 
   const handleChange = (evt) => {
     const {value } = evt.target;
-    setFilter(value);
+    const filterAction = {
+      type: 'contacts/filterContacts',
+      payload: value,
+    }
+    dispatch(filterAction)
 
 
   }
@@ -51,9 +60,11 @@ export const  App = () =>  {
   }
 
   const handleDelete = (id) => {
-    setContacts(prevState => prevState.filter(contact => contact.id !== id
-    ))
-
+    const deleteContactAction = {
+      type: 'contacts/deleteContacts',
+      payload: id,
+    }
+    dispatch(deleteContactAction)
   }
 
      return (

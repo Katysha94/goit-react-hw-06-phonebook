@@ -1,53 +1,31 @@
-import { useEffect } from 'react';
 import { ContactForm } from "./ContactForm/ContactForm";
 import { ContactList } from './ContactList/ContactList';
 import { FilterContact } from './FilterContact/FilterContact';
 import { Section } from './Section/Section';
 import { useDispatch, useSelector } from 'react-redux';
+import { addContact, deleteContact, filterContacts } from "redux/contacts/contacts.reducer";
+import { getContacts, getFilters } from "redux/contacts/contacts.selectors";
 
 
 export const App = () => {
   const dispatch = useDispatch();
-  const contacts = useSelector((state) => state.contactsStore.contacts);
-  const filter = useSelector((state) => state.contactsStore.filter);
+  const contacts = useSelector(getContacts);
+  const filter = useSelector(getFilters);
 
- 
-  
-  // useEffect(() => {
-    // const contacts = localStorage.getItem('contacts');
-    // const parsedContacts = JSON.parse(contacts)
-  
-  //   if (contacts) {
-  //     setContacts(parsedContacts)
-  //   } 
-  // }, [])
-
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts))
-  }, [contacts]);
- 
 
   function handleNewContact(newContact) {
     const existingContact = contacts.find(contact => contact.name === newContact.name);
     if (existingContact) {
       alert(`Contact ${newContact.name} already exists!`);
     } else {
-      const addContactAction = {
-        type: 'contacts/addContacts',
-        payload: newContact,
-      };
-      dispatch(addContactAction);
+      dispatch(addContact(newContact));
     }
 
   }
 
   const handleChange = (evt) => {
     const {value } = evt.target;
-    const filterAction = {
-      type: 'contacts/filterContacts',
-      payload: value,
-    }
-    dispatch(filterAction)
+    dispatch(filterContacts(value))
 
 
   }
@@ -60,11 +38,7 @@ export const App = () => {
   }
 
   const handleDelete = (id) => {
-    const deleteContactAction = {
-      type: 'contacts/deleteContacts',
-      payload: id,
-    }
-    dispatch(deleteContactAction)
+    dispatch(deleteContact(id))
   }
 
      return (

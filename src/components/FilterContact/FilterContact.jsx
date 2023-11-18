@@ -1,6 +1,19 @@
-import css from './FilterContact.module.css'
+import { filterContacts } from 'redux/contacts/contacts.reducer';
 
-export const FilterContact = ({ filter, handleChange }) => {
+
+export const FilterContact = () => {
+  
+    const dispatch = useDispatch();
+    const filter = useSelector(getFilters);
+
+
+    const handleChange = (evt) => {
+    const {value } = evt.target;
+    dispatch(filterContacts(value))
+
+
+  }
+
     return (
         <>
             <label className={css.filterLabel}>Find contacts by Name</label>

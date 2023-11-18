@@ -1,39 +1,33 @@
 import css from './ContactForm.module.css';
-import { useState } from 'react';
-import { nanoid } from 'nanoid'
+import { nanoid } from 'nanoid';
+import { useDispatch, useSelector } from 'react-redux';
+import { getContacts } from 'redux/contacts/contacts.selectors';
+import { addContact } from 'redux/contacts/contacts.reducer';
 
-
-export const ContactForm = ({newContact}) => {
+export const ContactForm = () => {
     
-  const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
 
+  const dispatch = useDispatch();
+  const contacts = useSelector(getContacts);
 
   const handleSubmit = (evt) => {
-        evt.preventDefault();
-        const addContact = {
+    evt.preventDefault();
+
+        const newContact = {
             id: nanoid(),
-            name,
-            number,
+            name: evt.target.elements.name.value,
+            number: evt.target.elements.number.value,
         }
-      newContact(addContact);
+    
+    const existingContact = contacts.find(contact => contact.name === newContact.name);
+    if (existingContact) {
+      alert(`Contact ${newContact.name} already exists!`);
+    } else {
+      dispatch(addContact(newContact));
+    }
       
       const form = evt.currentTarget;
       form.reset();
-      setName('');
-      setNumber('');
-    }
-
-    const handleNameChange = (evt) => {
-        const {value} = evt.target;
-      setName(value);
-      
-    }
-
-    const handleNumberChange = (evt) => {
-        const {value} = evt.target;
-      setNumber(value);
-      
     }
 
         return (
@@ -49,8 +43,6 @@ export const ContactForm = ({newContact}) => {
           type="text"
           name="name"
           id="name"
-          value={name}
-          onChange={handleNameChange}
           pattern={
             "^[a-zA-Zа-яА-Я]+(([' \\-][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
           }
@@ -64,8 +56,6 @@ export const ContactForm = ({newContact}) => {
           name="number"
           className={css.contactFormInput}
           id="number"
-          value={number}
-          onChange={handleNumberChange}
           pattern={
             '\\+?\\d{1,4}?[ .\\-\\s]?\\(?\\d{1,3}?\\)?[ .\\-\\s]?\\d{1,4}[ .\\-\\s]?\\d{1,4}[ .\\-\\s]?\\d{1,9}'
           }
